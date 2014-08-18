@@ -21,7 +21,6 @@ setup(
     author="Edwin Fine",
     author_email="me@edfine.io",
     url="https://github.com/SilentCircle/iap-local-receipt",
-    download_url="https://github.com/SilentCircle/iap-local-receipt/tarball/0.1.0",
     description="A library for local verification of Apple in-app receipts.",
     install_requires=[
         "pyasn1",
