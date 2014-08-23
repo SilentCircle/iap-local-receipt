@@ -31,48 +31,54 @@ If you have the dependencies, you have multiple options for installation:
 
 The simplest possible usage is:
 
-    from iap_local_receipt import IAPReceiptVerifier
+```python
+from iap_local_receipt import IAPReceiptVerifier
 
-    pkcs7_der = get_der_from_somewhere()
-    (
-        IAPReceiptVerifier(ca_cert_filename)
-            .verify_and_parse(pkcs7_der)
-            .validate('MY_AWESOME_PRODUCT')
-    )
+pkcs7_der = get_der_from_somewhere()
+(
+    IAPReceiptVerifier(ca_cert_filename)
+        .verify_and_parse(pkcs7_der)
+        .validate('MY_AWESOME_PRODUCT')
+)
+```
 
 To do a full validation:
 
-    from iap_local_receipt import IAPReceiptVerifier
+```python
+from iap_local_receipt import IAPReceiptVerifier
 
-    pkcs7_der = get_der_from_somewhere()
-    (
-        IAPReceiptVerifier(ca_cert_filename)
-            .verify_and_parse(pkcs7_der)
-            .validate('MY_AWESOME_PRODUCT',
-                      bundle_id='com.example.AwesomeApp',
-                      application_version='0',
-                      guid='urn:uuid:'
-                           '12345678-1234-5678-1234-567812345678')
-    )
+pkcs7_der = get_der_from_somewhere()
+(
+    IAPReceiptVerifier(ca_cert_filename)
+        .verify_and_parse(pkcs7_der)
+        .validate('MY_AWESOME_PRODUCT',
+                  bundle_id='com.example.AwesomeApp',
+                  application_version='0',
+                  guid='urn:uuid:'
+                       '12345678-1234-5678-1234-567812345678')
+)
+```
 
 Note that the hex-format GUID provided _must_ be prefixed with `urn:uuid` if it contains dashes.
 Alternatively, if the dashes are stripped out, the GUID may be used as-is.
 
 If validating a high volume of receipts, you may wish to instantiate the validator separately:
 
-    from iap_local_receipt import IAPReceiptVerifier
+```python
+from iap_local_receipt import IAPReceiptVerifier
 
-    verifier = IAPReceiptVerifier(ca_cert_filename)
+verifier = IAPReceiptVerifier(ca_cert_filename)
 
-    for pkcs7_der in lots_of_ders:
-        (
-            verifier.verify_and_parse(pkcs7_der)
-                    .validate('MY_AWESOME_PRODUCT',
-                              bundle_id='com.example.AwesomeApp',
-                              application_version='0',
-                              guid='urn:uuid:'
-                                   '12345678-1234-5678-1234-567812345678')
-        )
+for pkcs7_der in lots_of_ders:
+    (
+        verifier.verify_and_parse(pkcs7_der)
+                .validate('MY_AWESOME_PRODUCT',
+                          bundle_id='com.example.AwesomeApp',
+                          application_version='0',
+                          guid='urn:uuid:'
+                               '12345678-1234-5678-1234-567812345678')
+    )
+```
 
 If something went wrong with the validation, you can get the receipt and raw data from the verifier using the `last_receipt()` and `last_receipt_der()` member functions respectively.
 
@@ -80,20 +86,22 @@ Note that these may return `None` depending on where the failure occurred.
 
 You can also choose to use the `PKCS7Verifier`, `IAPReceiptParser`, and `IAPReceipt` classes individually:
 
-    from iap_local_receipt import PKCS7Verifier, IAPReceiptParser, IAPReceipt
+```python
+from iap_local_receipt import PKCS7Verifier, IAPReceiptParser, IAPReceipt
 
-    pkcs7_verifier = PKCS7Verifier(ca_cert_filename)
-    receipt_parser = IAPReceiptParser()
+pkcs7_verifier = PKCS7Verifier(ca_cert_filename)
+receipt_parser = IAPReceiptParser()
 
-    pkcs7_der = get_der_from_somewhere()
+pkcs7_der = get_der_from_somewhere()
 
-    receipt_der = pkcs7_verifier.verify_data(pkcs7_der)
-    iap_receipt = receipt_parser.parse_app_receipt(receipt_der)
-    iap_receipt.validate('MY_AWESOME_PRODUCT',
-                          bundle_id='com.example.AwesomeApp',
-                          application_version='0',
-                          guid='urn:uuid:'
-                               '12345678-1234-5678-1234-567812345678')
+receipt_der = pkcs7_verifier.verify_data(pkcs7_der)
+iap_receipt = receipt_parser.parse_app_receipt(receipt_der)
+iap_receipt.validate('MY_AWESOME_PRODUCT',
+                      bundle_id='com.example.AwesomeApp',
+                      application_version='0',
+                      guid='urn:uuid:'
+                           '12345678-1234-5678-1234-567812345678')
+```
 
 ## License
 
