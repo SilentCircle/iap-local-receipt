@@ -4,7 +4,7 @@ from pyasn1.type import namedtype, namedval, univ, char
 
 import rfc3339
 
-from iap_receipt import IAPReceipt
+from .iap_receipt import IAPReceipt
 
 
 #

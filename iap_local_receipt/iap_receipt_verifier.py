@@ -1,6 +1,6 @@
-from iap_pkcs7_verifier import PKCS7Verifier
-from iap_receipt_parser import IAPReceiptParser
-from iap_receipt import IAPReceipt
+from .iap_pkcs7_verifier import PKCS7Verifier
+from .iap_receipt_parser import IAPReceiptParser
+from .iap_receipt import IAPReceipt
 
 
 class IAPReceiptVerifier(object):

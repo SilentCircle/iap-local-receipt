@@ -5,8 +5,8 @@ import unittest
 import pprint
 
 sys.path.insert(0, os.path.abspath(__file__ + "/../.."))
-from iap_local_receipt.iap_receipt import IAPReceipt
-from iap_local_receipt.iap_receipt_verifier import IAPReceiptVerifier
+from .iap_receipt import IAPReceipt
+from .iap_receipt_verifier import IAPReceiptVerifier
 
 SAMPLE_RECEIPT_B64 = [
 """
