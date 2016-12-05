@@ -17,7 +17,6 @@ The library provides functions and classes to do the following.
 To install `iap_local_receipt` you need:
 
 * Python 2.5 or later in the 2.x line (earlier than 2.5 not tested).
-* `swig` and the gcc compiler to compile `M2Crypto`.
 
 If you have the dependencies, you have multiple options for installation:
 

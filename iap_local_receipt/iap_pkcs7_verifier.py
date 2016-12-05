@@ -1,91 +1,78 @@
-from M2Crypto import SMIME, X509, BIO, Err, m2
-from M2Crypto.SMIME import PKCS7
+from OpenSSL import crypto
+from cffi import FFI
+
+ffi = FFI()
 
 
 class PKCS7VerifyError(Exception):
-    pass
+    def __init__(self, message=None, **kwargs):
+        super(PKCS7VerifyError, self).__init__(
+            message or ffi.string(crypto._lib.ERR_error_string(crypto._lib.ERR_get_error(), ffi.NULL)),
+            **kwargs
+        )
 
 
 class PKCS7Verifier:
     def __init__(self, root_ca_cert_file=None, root_ca_cert_string=None):
-        self.smime = SMIME.SMIME()
-
+        self.store = None
         if root_ca_cert_file:
             self.load_ca_cert_file(root_ca_cert_file)
         elif root_ca_cert_string:
             self.load_ca_cert_string(root_ca_cert_string)
 
-        # OpenSSL will find the signer's cert in the PKCS7 data,
-        # but SMIME.verify still needs a stack of signer certs,
-        # even if it is empty, which is what we do here.
-        self.smime.set_x509_stack(X509.X509_Stack())
-
     def load_ca_cert_file(self, ca_cert_file):
         """
         Load a CA cert from a PEM file, replacing any previous cert.
         """
-        cert = X509.load_cert(ca_cert_file)
-        self._load_cert(cert)
+        self.load_ca_cert_string(open(ca_cert_file, 'r').read())
 
     def load_ca_cert_string(self, ca_cert_string):
         """
         Load a CA cert from a PEM string, replacing any previous cert.
         """
-        cert = X509.load_cert_string(ca_cert_string)
+        cert = crypto.load_certificate(crypto.FILETYPE_PEM, ca_cert_string)
         self._load_cert(cert)
 
     def _load_cert(self, cert):
-        st = X509.X509_Store()
-        st.add_cert(cert)
-        self.smime.set_x509_store(st)
+        self.store = crypto.X509Store()
+        self.store.add_cert(cert)
 
-    def verify_file(self, pkcs7_der_file):
+    def verify_file(self, pkcs7_der_file, verify_time=None):
         """
         Verify signature on signed PKCS7 DER file.
         Return blob containing the signed data.
         Throw PKCS7VerifyError if verification failed.
         This will fail if the CA cert has not been loaded.
         """
-        # Load the data, verify it.
-        p7 = load_pkcs7_der(pkcs7_der_file)
-        return self._verify(p7)
+        return self.verify_data(open(pkcs7_der_file, 'r').read(), verify_time)
 
-    # This will fail if the ca cert has not been loaded
-    def verify_data(self, pkcs7_der):
+    def verify_data(self, pkcs7_der, verify_time=None):
         """
         Verify signature on signed PKCS7 DER blob.
         Return blob containing the signed data.
         Throw PKCS7VerifyError if verification failed.
         This will fail if the CA cert has not been loaded.
         """
+        store = self.store or crypto.X509Store()
+        if verify_time:
+            store.set_time(verify_time)
         p7 = load_pkcs7_bio_der(pkcs7_der)
-        return self._verify(p7)
+        out = crypto._new_mem_buf()
+        if not crypto._lib.PKCS7_verify(p7._pkcs7, ffi.NULL, store._store, ffi.NULL, out, 0):
+            raise PKCS7VerifyError()
+        return crypto._bio_to_string(out)
 
-    def _verify(self, p7):
-        try:
-            blob = self.smime.verify(p7)
-        except Exception as error:
-            raise PKCS7VerifyError(error.args)
-        return blob
-
-
-def load_pkcs7_der(p7file):
-    """
-    Load a PKCS7 object from a PKCS7 DER file.
-    Return PKCS7 object.
-    """
-    bio = m2.bio_new_file(p7file, 'r')
-    if bio is None:
-        raise PKCS7VerifyError(Err.get_error())
-
-    try:
-        p7_ptr = m2.pkcs7_read_bio_der(bio)
-    finally:
-        m2.bio_free(bio)
-
-    if p7_ptr is None:
-        raise PKCS7VerifyError(Err.get_error())
-    return PKCS7(p7_ptr, 1)
+    @staticmethod
+    def get_data_without_certificate_verification(pkcs7_der):
+        """
+        Return blob containing the signed data without certificate chain verification (but with signature verification).
+        Throw PKCS7VerifyError if signature verification failed.
+        """
+        p7 = load_pkcs7_bio_der(pkcs7_der)
+        out = crypto._new_mem_buf()
+        if not crypto._lib.PKCS7_verify(p7._pkcs7, ffi.NULL, ffi.NULL, ffi.NULL, out, crypto._lib.PKCS7_NOVERIFY):
+            raise PKCS7VerifyError(crypto._lib.ERR_get_error())
+        return crypto._bio_to_string(out)
 
 
 def load_pkcs7_bio_der(p7_der):
@@ -93,12 +80,7 @@ def load_pkcs7_bio_der(p7_der):
     Load a PKCS7 object from a PKCS7 DER blob.
     Return PKCS7 object.
     """
-    bio = BIO.MemoryBuffer(p7_der)
-    if bio is None:
-        raise PKCS7VerifyError(Err.get_error())
-
-    p7_ptr = m2.pkcs7_read_bio_der(bio._ptr())
-
-    if p7_ptr is None:
-        raise PKCS7VerifyError(Err.get_error())
-    return PKCS7(p7_ptr, 1)
+    try:
+        return crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, p7_der)
+    except:
+        raise PKCS7VerifyError(crypto._lib.ERR_get_error())

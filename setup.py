@@ -17,7 +17,7 @@ classifiers = [
 
 setup(
     name="iap_local_receipt",
-    version="0.1.0",
+    version="0.2.0",
     author="Edwin Fine",
     author_email="me@edfine.io",
     url="https://github.com/SilentCircle/iap-local-receipt",
@@ -25,8 +25,8 @@ setup(
     install_requires=[
         "pyasn1",
         "pyasn1_modules",
-        "m2crypto",
-        ],
+        "pyopenssl",
+    ],
     license="BSD",
     classifiers=classifiers,
     packages=["iap_local_receipt"],
