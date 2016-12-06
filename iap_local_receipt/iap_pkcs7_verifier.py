@@ -24,7 +24,7 @@ class PKCS7Verifier:
         """
         Load a CA cert from a PEM file, replacing any previous cert.
         """
-        self.load_ca_cert_string(open(ca_cert_file, 'r').read())
+        self.load_ca_cert_string(open(ca_cert_file, 'rb').read())
 
     def load_ca_cert_string(self, ca_cert_string):
         """
@@ -44,7 +44,7 @@ class PKCS7Verifier:
         Throw PKCS7VerifyError if verification failed.
         This will fail if the CA cert has not been loaded.
         """
-        return self.verify_data(open(pkcs7_der_file, 'r').read(), verify_time)
+        return self.verify_data(open(pkcs7_der_file, 'rb').read(), verify_time)
 
     def verify_data(self, pkcs7_der, verify_time=None):
         """

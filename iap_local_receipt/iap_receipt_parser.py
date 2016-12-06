@@ -2,7 +2,7 @@ from pyasn1_modules import rfc2315
 from pyasn1.codec.der import decoder
 from pyasn1.type import namedtype, namedval, univ, char
 
-import rfc3339
+from . import rfc3339
 
 from .iap_receipt import IAPReceipt
 
