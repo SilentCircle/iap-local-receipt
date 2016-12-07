@@ -82,5 +82,5 @@ def load_pkcs7_bio_der(p7_der):
     """
     try:
         return crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, p7_der)
-    except:
-        raise PKCS7VerifyError(crypto._lib.ERR_get_error())
+    except crypto.Error as ex:
+        raise PKCS7VerifyError(ex)
