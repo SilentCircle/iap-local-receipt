@@ -25,7 +25,7 @@ setup(
     install_requires=[
         "pyasn1",
         "pyasn1_modules",
-        "pyopenssl>=16.3.0",
+        "pyopenssl>=17.0.0",
     ],
     license="BSD",
     classifiers=classifiers,
