@@ -2,7 +2,7 @@ from pyasn1_modules import rfc2315
 from pyasn1.codec.der import decoder
 from pyasn1.type import namedtype, namedval, univ, char
 
-import rfc3339
+from . import rfc3339
 
 from .iap_receipt import IAPReceipt
 
@@ -14,6 +14,7 @@ FT_BUNDLE_ID = 2
 FT_APPLICATION_VERSION = 3
 FT_OPAQUE_VALUE = 4
 FT_SHA1_HASH = 5
+FT_RECEIPT_CREATION_DATE = 12
 FT_IN_APP = 17
 FT_ORIGINAL_APPLICATION_VERSION = 19
 FT_EXPIRATION_DATE = 21
@@ -85,6 +86,7 @@ RCPT_FIELD_MAP = {
     FT_APPLICATION_VERSION:          (lambda x: octets_to_utf8(x)),
     FT_OPAQUE_VALUE:                 (lambda x: x.asOctets()),
     FT_SHA1_HASH:                    (lambda x: x.asOctets()),
+    FT_RECEIPT_CREATION_DATE:        (lambda x: ia5_to_datetime(x)),
     FT_ORIGINAL_APPLICATION_VERSION: (lambda x: octets_to_utf8(x)),
     FT_EXPIRATION_DATE:              (lambda x: ia5_to_datetime(x)),
 }
@@ -113,6 +115,7 @@ class AppReceiptFieldType(univ.Integer):
         ('opaque_value',                 FT_OPAQUE_VALUE),
         ('sha1_hash',                    FT_SHA1_HASH),
         ('in_app',                       FT_IN_APP),
+        ('receipt_creation_date',        FT_RECEIPT_CREATION_DATE),
         ('original_application_version', FT_ORIGINAL_APPLICATION_VERSION),
         ('expiration_date',              FT_EXPIRATION_DATE)
     )
@@ -124,7 +127,7 @@ class AppReceiptField(univ.Sequence):
         namedtype.NamedType('type',    AppReceiptFieldType()),
         namedtype.NamedType('version', rfc2315.Version()),
         namedtype.NamedType('value',   univ.OctetString())
-        )
+    )
 
 
 class AppReceipt(univ.SetOf):

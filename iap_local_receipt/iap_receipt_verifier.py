@@ -24,10 +24,12 @@ class IAPReceiptVerifier(object):
         signed data (the actual receipt ASN.1 data).
         Return IAPReceipt.
         """
-        receipt_der = self.verify_signature(pkcs7_der)
+        receipt_der = self._verifier.get_data_without_certificate_verification(pkcs7_der)
+        receipt = self.parse(receipt_der)
+        receipt_der = self.verify_signature(pkcs7_der, receipt_time=receipt.receipt['receipt_creation_date'])
         return self.parse(receipt_der)
 
-    def verify_signature(self, pkcs7_der):
+    def verify_signature(self, pkcs7_der, receipt_time=None):
         """
         Extract the PKCS7 container from the DER binary.
         Verify the receipt signature against Apple's Root CA cert,
@@ -35,7 +37,7 @@ class IAPReceiptVerifier(object):
         data.
         Return the raw receipt blob in ASN.1 format.
         """
-        return self._verifier.verify_data(pkcs7_der)
+        return self._verifier.verify_data(pkcs7_der, receipt_time)
 
     def parse(self, receipt_der):
         """
