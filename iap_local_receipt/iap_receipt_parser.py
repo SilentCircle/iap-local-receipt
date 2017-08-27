@@ -10,6 +10,7 @@ from .iap_receipt import IAPReceipt
 #
 # ASN.1 Receipt field types
 #
+FT_STAGE = 0
 FT_BUNDLE_ID = 2
 FT_APPLICATION_VERSION = 3
 FT_OPAQUE_VALUE = 4
@@ -83,6 +84,7 @@ IN_APP_FIELD_MAP = {
 }
 
 RCPT_FIELD_MAP = {
+    FT_STAGE:                        (lambda x: octets_to_utf8(x)),
     FT_BUNDLE_ID:                    (lambda x: octets_to_utf8(x)),
     FT_APPLICATION_VERSION:          (lambda x: octets_to_utf8(x)),
     FT_OPAQUE_VALUE:                 (lambda x: x.asOctets()),
@@ -112,6 +114,7 @@ class FieldMap:
 class AppReceiptFieldType(univ.Integer):
     """Apple App Receipt named field type"""
     namedValues = namedval.NamedValues(
+        ('stage',                        FT_STAGE),
         ('bundle_id',                    FT_BUNDLE_ID),
         ('application_version',          FT_APPLICATION_VERSION),
         ('opaque_value',                 FT_OPAQUE_VALUE),
