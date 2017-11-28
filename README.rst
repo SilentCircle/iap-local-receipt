@@ -17,7 +17,7 @@ The library provides functions and classes to do the following.
 Recent Changes
 --------------
 - v0.2.0: Replaces ``M2Crypto`` with ``pyOpenSSL`` to validate the receipt's
-  signature correctly. Thanks to Ilya Konstantantinov for the pull request.
+  signature correctly. Thanks to Ilya Konstantionv for the pull request.
 
 Installation
 ============
