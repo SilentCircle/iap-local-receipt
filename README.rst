@@ -63,7 +63,7 @@ To do a full validation::
                            '12345678-1234-5678-1234-567812345678')
     )
 
-Note that the hex-format GUID provided *must* be prefixed with `urn:uuid` if it
+Note : The hex-format GUID provided *must* be prefixed with `urn:uuid` if it
 contains dashes.  Alternatively, if the dashes are stripped out, the GUID may
 be used as-is.
 
