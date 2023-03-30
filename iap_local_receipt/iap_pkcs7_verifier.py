@@ -3,6 +3,8 @@ from cffi import FFI
 
 ffi = FFI()
 
+PKCS7_NOVERIFY = 0x20
+
 
 class PKCS7VerifyError(Exception):
     def __init__(self, message=None, **kwargs):
@@ -70,7 +72,7 @@ class PKCS7Verifier:
         """
         p7 = load_pkcs7_bio_der(pkcs7_der)
         out = crypto._new_mem_buf()
-        if not crypto._lib.PKCS7_verify(p7._pkcs7, ffi.NULL, ffi.NULL, ffi.NULL, out, crypto._lib.PKCS7_NOVERIFY):
+        if not crypto._lib.PKCS7_verify(p7._pkcs7, ffi.NULL, ffi.NULL, ffi.NULL, out, PKCS7_NOVERIFY):
             raise PKCS7VerifyError(crypto._lib.ERR_get_error())
         return crypto._bio_to_string(out)
 
